@@ -1,8 +1,8 @@
 ﻿namespace MyWebServer.Results
 {
-    using System.IO;
     using MyWebServer.Http;
     using MyWebServer.Results.Views;
+    using System.IO;
 
     public class ViewResult : ActionResult
     {
@@ -12,12 +12,12 @@
         public ViewResult(
             HttpResponse response,
             IViewEngine viewEngine,
-            string viewName, 
-            string controllerName, 
+            string viewName,
+            string controllerName,
             object model,
             string userId)
-            : base(response) 
-            => this.GetHtml(viewEngine,viewName, controllerName, model,userId);
+            : base(response)
+            => this.GetHtml(viewEngine, viewName, controllerName, model, userId);
 
         private void GetHtml(IViewEngine viewEngine, string viewName, string controllerName, object model, string userId)
         {
@@ -37,9 +37,9 @@
 
             var viewContent = File.ReadAllText(viewPath);
 
-            var layoutPath = Path.GetFullPath("./Views/Layout.cshtml");
+            var (layoutPath, layoutExists) = FindLayout();
 
-            if (File.Exists(layoutPath))
+            if (layoutExists)
             {
                 var layoutContent = File.ReadAllText(layoutPath);
 
@@ -51,7 +51,7 @@
             this.SetContent(viewContent, HttpContentType.Html);
         }
 
-        private (string,bool) FindView(string viewName)
+        private (string, bool) FindView(string viewName)
         {
             string viewPath = null;
             var exists = false;
@@ -68,6 +68,34 @@
             }
 
             return (viewPath, exists);
+        }
+
+        private (string, bool) FindLayout()
+        {
+            string layoutPath = null;
+            bool exists = false;
+
+            foreach (var fileExtension in ViewFileExtensions)
+            {
+                layoutPath = Path.GetFullPath($"./Views/Layout.{fileExtension}");
+
+                if (File.Exists(layoutPath))
+                {
+                    exists = true;
+                    break;
+                }
+
+                layoutPath = Path.GetFullPath($"./Views/Shared/_Layout.{fileExtension}");
+
+                if (File.Exists(layoutPath))
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            return (layoutPath, exists);
+
         }
 
         private void PrepareMissingViewError(string viewPath)
