@@ -2,9 +2,10 @@
 {
     using CarShop.Models.Users;
     using System;
+    using System.Collections.Generic;
 
     public interface IValidator
     {
-        bool ValidateUserRegistration(RegisterUserFormModel model);
+        ICollection<string> ValidateUser(RegisterUserFormModel user);
     }
 }

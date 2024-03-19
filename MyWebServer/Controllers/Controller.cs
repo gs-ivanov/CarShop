@@ -64,6 +64,9 @@
         protected ActionResult Html(string html)
             => new HtmlResult(this.Response, html);
 
+        protected ActionResult BadRequest()
+            => new BadRequestResult(this.Response);
+
         protected ActionResult Redirect(string location)
             => new RedirectResult(this.Response, location);
 

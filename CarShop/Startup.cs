@@ -16,7 +16,7 @@
               .MapStaticFiles()
               .MapControllers())
           .WithServices(services => services
-              .Add<IValidator,Validator>()
+              .Add<IValidator, Validator>()
               .Add<IViewEngine, CompilationViewEngine>()
               .Add<CarShopDbContext>())
           .WithConfiguration<CarShopDbContext>(context=> context
