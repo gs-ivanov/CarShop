@@ -5,6 +5,7 @@
     using MyWebServer.Results;
     using MyWebServer.Results.Views;
     using System.Runtime.CompilerServices;
+    using System.Collections.Generic;
 
     public abstract class Controller
     {
@@ -77,7 +78,13 @@
             => this.GetViewResult(viewName, model);
 
         protected ActionResult View(object model, [CallerMemberName] string viewName = "")
-           =>this.GetViewResult(viewName, model);
+           => this.GetViewResult(viewName, model);
+
+        protected ActionResult Error(string error)
+           => this.Error(new[] { error });
+
+        protected ActionResult Error(IEnumerable<string> errors)
+           => this.View("./Error", errors);
 
         private ActionResult GetViewResult(string viewName, object model)
            => new ViewResult(this.Response, this.ViewEngine, viewName, this.GetType().GetControllerName(), model, this.User.Id);

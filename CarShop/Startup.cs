@@ -17,6 +17,7 @@
               .MapControllers())
           .WithServices(services => services
               .Add<IValidator, Validator>()
+              .Add<IPasswordHasher, PasswordHasher>()
               .Add<IViewEngine, CompilationViewEngine>()
               .Add<CarShopDbContext>())
           .WithConfiguration<CarShopDbContext>(context=> context

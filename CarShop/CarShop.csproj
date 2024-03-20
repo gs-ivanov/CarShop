@@ -16,6 +16,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <None Remove="Views\Error.cshtml" />
 	  <None Remove="Views\Layout.cshtml" />
 	</ItemGroup>
 	
