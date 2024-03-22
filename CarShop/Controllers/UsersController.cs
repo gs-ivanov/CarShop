@@ -8,7 +8,7 @@
     using MyWebServer.Http;
     using System.Linq;
 
-    using static CarShop.Data.DataConstants;
+    using static Data.DataConstants;
 
     public class UsersController : Controller
     {
@@ -16,7 +16,10 @@
         private readonly IValidator validator;
         private readonly CarShopDbContext data;
 
-        public UsersController(CarShopDbContext data,IValidator validator, IPasswordHasher passwordHasher)
+        public UsersController(
+            CarShopDbContext data,
+            IValidator validator,
+            IPasswordHasher passwordHasher)
         {
             this.data = data;
             this.validator = validator;
@@ -30,11 +33,6 @@
         {
             var modelErrors = this.validator.ValidateUser(model);
 
-            if (modelErrors.Any())
-            {
-                return Error( modelErrors);
-            }
-
             if (data.Users.Any(u => u.Username == model.Username))
             {
                 modelErrors.Add($"User with '{model.Username}' username already exists.");
@@ -43,6 +41,11 @@
             if (data.Users.Any(u => u.Email == model.Email))
             {
                 modelErrors.Add($"User with '{model.Email}' e-mail already exists.");
+            }
+
+            if (modelErrors.Any())
+            {
+                return Error( modelErrors);
             }
 
             var user = new User

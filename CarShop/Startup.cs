@@ -16,6 +16,7 @@
               .MapStaticFiles()
               .MapControllers())
           .WithServices(services => services
+              .Add<IUserService, UserService>()
               .Add<IValidator, Validator>()
               .Add<IPasswordHasher, PasswordHasher>()
               .Add<IViewEngine, CompilationViewEngine>()

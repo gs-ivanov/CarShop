@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class AddCarFormModel
+    public class CarAddFormModel
     {
         public string Model { get; init; }
 
