@@ -10,7 +10,7 @@
     {
         ICollection<string> ValidateUser(RegisterUserFormModel user);
 
-        ICollection<string> ValidateCar(CarAddFormModel car);
+        ICollection<string> ValidateCar(AddCarFormModel car);
 
         ICollection<string> ValidateIssue(AddIssueFormModel issue);
 

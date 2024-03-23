@@ -4,8 +4,8 @@
 
     public class AddIssueFormModel
     {
-        public string CarId { get; set; }
+        public string Description { get; init; }
 
-        public string Description { get; set; }
+        public string CarId { get; init; }
     }
 }

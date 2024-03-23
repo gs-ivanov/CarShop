@@ -6,31 +6,64 @@
     using CarShop.Services;
     using MyWebServer.Controllers;
     using MyWebServer.Http;
-    using System.Collections.Generic;
     using System.Linq;
-
+    //using System.Collections.Generic;
     public class CarsController : Controller
     {
         private readonly IValidator validator;
         private readonly CarShopDbContext data;
-        private readonly IUserService userService;
+        private readonly IUserService users;
 
         public CarsController(
             IValidator validator,
-            IUserService userService,
+            IUserService users,
             CarShopDbContext data)
         {
             this.validator = validator;
             this.data = data;
-            this.userService = userService;
+            this.users = users;
+        }
+
+        [Authorize]
+        public HttpResponse All()
+        {
+            var carsQuery = this.data
+                .Cars
+                .AsQueryable();
+
+            if (this.users.IsMechanic(this.User.Id))
+            {
+                carsQuery = carsQuery
+                    .Where(c => c.Issues.Any(i => !i.IsFixed));
+            }
+            else
+            {
+                carsQuery = carsQuery
+                     .Where(c => c.OwnerId == this.User.Id);
+            }
+
+            var cars = carsQuery
+                .Select(c => new CarListingViewModel()
+                {
+                    Id = c.Id,
+                    Model = c.Model,
+                    Year = c.Year,
+                    Image = c.PictureUrl,
+                    PlateNumber = c.PlateNumber,
+                    RemainingIssues = c.Issues.Count(i => !i.IsFixed),
+                    FixedIssues = c.Issues.Count(i => i.IsFixed),
+                })
+               .ToList();
+
+            return View(cars);
         }
 
         [Authorize]
         public HttpResponse Add()
         {
-            if (this.userService.IsMechanic(this.User.Id))
+            if (this.users.IsMechanic(this.User.Id))
             {
-                return Unauthorized();
+                return Error("Mechanics cannot add cars.");
             }
 
             return View();
@@ -38,13 +71,8 @@
 
         [Authorize]
         [HttpPost]
-        public HttpResponse Add(CarAddFormModel model)
+        public HttpResponse Add(AddCarFormModel model)
         {
-            if (this.userService.IsMechanic(this.User.Id))
-            {
-                return Unauthorized();
-            }
-
             var modelErrors = this.validator.ValidateCar(model);
 
             if (modelErrors.Any())
@@ -68,51 +96,5 @@
             return Redirect("/Cars/All");
         }
 
-        [Authorize]
-        public HttpResponse All()
-        {
-            List<CarListingViewModel> cars;
-
-            if (this.userService.IsMechanic(this.User.Id))
-            {
-                cars = this.data
-                     .Cars
-                     .Where(c => c.Issues.Any(i => !i.IsFixed))
-                    .Select(c => new CarListingViewModel()
-                    {
-                        Id = c.Id,
-                        Model = c.Model,
-                        Year = c.Year,
-                        Image = c.PictureUrl,
-                        PlateNumber = c.PlateNumber,
-                        FixedIssues = c.Issues
-                        .Where(i => i.IsFixed).Count(),
-                        ReminingIssues = c.Issues
-                        .Where(i => !i.IsFixed).Count(),
-                    })
-                     .ToList();
-            }
-            else
-            {
-                cars = this.data
-                   .Cars
-                   .Where(c => c.OwnerId == this.User.Id)
-                   .Select(c => new CarListingViewModel()
-                   {
-                       Id = c.Id,
-                       Model = c.Model,
-                       Year = c.Year,
-                       Image = c.PictureUrl,
-                       PlateNumber = c.PlateNumber,
-                       FixedIssues = c.Issues
-                       .Where(i => i.IsFixed).Count(),
-                       ReminingIssues = c.Issues
-                       .Where(i => !i.IsFixed).Count(),
-                   })
-                   .ToList();
-
-            }
-            return View(cars);
-        }
     }
 }

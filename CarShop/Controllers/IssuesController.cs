@@ -60,7 +60,7 @@
         }
 
         [Authorize]
-        public HttpResponse Add(string carID) => View(new IssueAddViewModel
+        public HttpResponse Add(string carID) => View(new AddIssueViewModel
         {
             CarId = carID
         });

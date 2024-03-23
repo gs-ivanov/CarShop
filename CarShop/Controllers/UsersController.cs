@@ -33,7 +33,7 @@
         {
             var modelErrors = this.validator.ValidateUser(model);
 
-            if (data.Users.Any(u => u.Username == model.Username))
+            if (this.data.Users.Any(u => u.Username == model.Username))
             {
                 modelErrors.Add($"User with '{model.Username}' username already exists.");
             }
@@ -45,15 +45,15 @@
 
             if (modelErrors.Any())
             {
-                return Error( modelErrors);
+                return Error(modelErrors);
             }
 
             var user = new User
             {
-                Username=model.Username,
-                Password= this.passwordHasher.HashPassword(model.Password),
-                Email=model.Email,
-                IsMechanic=model.UserType== UserTypeMechanic
+                Username = model.Username,
+                Password = this.passwordHasher.HashPassword(model.Password),
+                Email = model.Email,
+                IsMechanic = model.UserType == UserTypeMechanic
             };
 
             data.Users.Add(user);
@@ -66,7 +66,7 @@
         public HttpResponse Login() => View();
 
         [HttpPost]
-        public HttpResponse Login(UserLoginFormModel model)
+        public HttpResponse Login(LoginUserFormModel model)
         {
             var hashedPassword = this.passwordHasher.HashPassword(model.Password);
 
@@ -76,7 +76,7 @@
                 .Select(u => u.Id)
                 .FirstOrDefault();
 
-            if (userId==null)
+            if (userId == null)
             {
                 return Error("Username and password combination is not valid");
             }
